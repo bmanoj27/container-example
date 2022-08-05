@@ -1,4 +1,4 @@
-FROM ubi8/ubi:8.3
+FROM ubuntu:18.04
 
 MAINTAINER Manoj Kumar  <testmail@test.com_>
 
