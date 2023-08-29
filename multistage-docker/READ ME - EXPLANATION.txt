@@ -1,0 +1,32 @@
+Step 1: Set Up the Build Environment
+
+FROM openjdk:11 AS BUILD_IMAGE: This tells Docker to use the openjdk:11 base image as the starting point for this stage. We're giving this stage the name BUILD_IMAGE.
+
+RUN apt update && apt install maven -y: This installs Maven inside the container by running system commands. It updates the package lists and then installs Maven.
+
+RUN git clone ...: This command clones a Git repository from the specified URL. It's grabbing the source code for a project from a GitHub repository named vprofile-project.
+
+RUN cd vprofile-project && git checkout docker && mvn install: These commands navigate into the vprofile-project directory, switch to a specific branch named docker, and then use Maven to build the project (by running mvn install).
+
+
+
+Step 2: Create the Final Image
+
+FROM tomcat:9-jre11: This sets up the second part of our Docker image. It's using a different base image (tomcat:9-jre11), which has Tomcat and Java 11 ready to go.
+
+RUN rm -rf /usr/local/tomcat/webapps/*: This removes any existing files from the Tomcat webapps directory. It's like cleaning up the space where we'll put our application.
+
+COPY --from=BUILD_IMAGE ...: This copies the result of the build from the previous BUILD_IMAGE stage into this current stage. It takes the vprofile-v2.war file that was created during the Maven build and places it in the Tomcat webapps directory with a new name (ROOT.war).
+
+EXPOSE 8080: This informs Docker that the container will be listening on port 8080. It doesn't actually open the port, but it's a useful note for anyone looking at the Dockerfile.
+
+CMD ["catalina.sh", "run"]: This specifies the command that should be run when the container starts. It's telling Tomcat to start and run our application using the catalina.sh script.
+
+
+
+In simpler terms, this Dockerfile does the following:
+
+In the first stage, it sets up a build environment with Java and Maven, clones a project from GitHub, and builds it using Maven.
+In the second stage, it creates a Docker image with Tomcat and Java, removes any old files from the webapps directory, and copies the built vprofile-v2.war file into Tomcat's webapps directory.
+It indicates that the container will listen on port 8080, and when the container starts, it runs Tomcat to host our application.
+This Dockerfile essentially helps you package your Java web application (vProfile) and its dependencies into a Docker container, making it easy to deploy and run.
