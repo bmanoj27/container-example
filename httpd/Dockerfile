@@ -1,13 +1,9 @@
-FROM nginx:alpine
+FROM httpd:2.4
 
-# Create the directory for the HTML file
-RUN mkdir -p /usr/share/nginx/html
+RUN sed -i 's/Listen 80/Listen 8080/' /usr/local/apache2/conf/httpd.conf
 
-# Create the HTML file
-RUN echo '<html><body><h1>Hello, World from a Pod in OpenShift.!</h1></body></html>' > /usr/share/nginx/html/index.html
+RUN chmod -R 777 /usr/local/apache2
 
-# Expose port 80
-EXPOSE 80
+COPY . /usr/local/apache2/htdocs/
 
-# Start nginx server
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080
